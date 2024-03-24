@@ -75,20 +75,20 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
   const id = e.target.getAttribute('href');
   document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
 });
-// Menu fade animation...
-// const handleHover = function (e) {
-//   if (e.target.classList.contains('nav__link')) {
-//     const link = e.target;
-//     const siblings = link.closest('.nav').querySelectorAll('.nav__link');
-//     const logo = link.closest('.nav').querySelector('img');
-//     siblings.forEach(el => {
-//       if (el !== link) el.style.opacity = this;
-//     });
-//     logo.style.opacity = this;
-//   }
-// };
-// nav.addEventListener('mouseover', handleHover.bind(0.5));
-// nav.addEventListener('mouseout', handleHover.bind(1));
+//Menu fade animation...
+const handleHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = this;
+    });
+    logo.style.opacity = this;
+  }
+};
+nav.addEventListener('mouseover', handleHover.bind(0.5));
+nav.addEventListener('mouseout', handleHover.bind(1));
 // // Sticky Navigation...
 // const initialCoords = section1.getBoundingClientRect();
 // window.addEventListener('scroll', function () {
@@ -111,6 +111,7 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 
 // Menu fade animation user IntersectionObserver API
 const header = document.querySelector('.header');
+
 const navHeight = nav.getBoundingClientRect().height;
 const stickyNav = function (entries) {
   const [entry] = entries;
@@ -141,7 +142,7 @@ const sectionObserver = new IntersectionObserver(revealSection, {
 
 allSections.forEach(function (section) {
   sectionObserver.observe(section);
-  section.classList.add('section--hidden');
+  //section.classList.add('section--hidden');
 });
 // Reveal Images.
 const imgTargets = document.querySelectorAll('img[data-src]');
@@ -166,6 +167,82 @@ const imgOberver = new IntersectionObserver(loadImg, {
 });
 imgTargets.forEach(img => imgOberver.observe(img));
 
+//********************************* */
+// Slider Component...
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+
+const slider = document.querySelector('.slider');
+let currentSlide = 0;
+const maxSlide = slides.length;
+const dotContainer = document.querySelector('.dots');
+
+// Functions
+const createDots = function () {
+  slides.forEach(function (_, i) {
+    dotContainer.insertAdjacentHTML(
+      'beforeend',
+      `<button class="dots__dot" data-slide="${i}"></button>`
+    );
+  });
+};
+const goToSlide = function (slide) {
+  slides.forEach(
+    (s, i) => (s.style.transform = `translateX(${100 * (i - currentSlide)}%)`)
+  );
+};
+
+const activateDot = function (slide) {
+  document
+    .querySelectorAll('.dots__dot')
+    .forEach(dot => dot.classList.remove('dots__dot--active'));
+  document
+    .querySelector(`.dots__dot[data-slide="${slide}"]`)
+    .classList.add('dots__dot--active');
+};
+
+const nextSlid = function () {
+  if (currentSlide === maxSlide - 1) {
+    currentSlide = 0;
+  } else {
+    currentSlide++;
+  }
+  goToSlide(currentSlide);
+  activateDot(currentSlide);
+};
+const prevSlide = function () {
+  if (currentSlide === 0) {
+    currentSlide = maxSlide - 1;
+  } else {
+    currentSlide--;
+  }
+  goToSlide(currentSlide);
+  activateDot(currentSlide);
+};
+const init = function () {
+  goToSlide(0);
+  createDots();
+  activateDot(0);
+};
+init();
+// Event Handlers...
+btnRight.addEventListener('click', nextSlid);
+btnLeft.addEventListener('click', prevSlide);
+// Slider using ArrowKeys...
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowLeft') prevSlide();
+  e.key === 'ArrowRight' && nextSlid();
+  activateDot(currentSlide);
+});
+//
+dotContainer.addEventListener('click', function (e) {
+  if (e.target.classList.contains('dots__dot')) {
+    currentSlide = +e.target.dataset.slide;
+    goToSlide(currentSlide);
+    activateDot(currentSlide);
+  }
+});
 // const header = document.querySelector('.header');
 // const message = document.createElement('div');
 // message.classList.add('cookie-message');
